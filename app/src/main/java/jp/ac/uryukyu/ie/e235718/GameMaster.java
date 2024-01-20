@@ -7,6 +7,8 @@ import java.util.Scanner;
 public class GameMaster {
     ArrayList<Card> cards;
     Player[] players;
+    int n;
+    Scanner scanner;
 
     GameMaster() {
         this.cards = new ArrayList<>();
@@ -22,14 +24,13 @@ public class GameMaster {
             } 
         }
 
-        Scanner scanner = new Scanner(System.in);
+        this.scanner = new Scanner(System.in);
         for (int i = 0; i < 2; i ++) {
             System.out.println("\n名前を入力してください。");
             String name = scanner.next();
-            this.players[i] = new Player(name);
+            this.players[i] = new Player(name, i + 1);
             System.out.printf("プレイヤー%dの名前は%sです。\n", i + 1, players[i].getName());
         }
-        scanner.close();
     }
 
     public void dealOut() {
@@ -41,9 +42,64 @@ public class GameMaster {
                 this.cards.remove(this.cards.get(num));
             }
         }
+    }
 
-        for (Player player : this.players){
-            System.out.println(player.getHands().size());
+    public void startGame() {
+        this.n = startPlayer();
+        for (int i = 0; i < 26; i ++ ) {
+            System.out.printf("\n--------------------------\n");
+            System.out.printf("プレイヤー%dの攻撃です。\n", this.players[this.n % 2].getNumber());
+            Card offenceCard = this.players[0].getHands().get(0);
+            Card defenceCard = this.players[1].getHands().get(0);
+            System.out.printf("プレイヤー%dのカードは%sです。\n", this.players[(this.n + 1) % 2].getNumber(), defenceCard.showCard());
+            System.out.println("highかlowか入力してください。");
+            if (this.scanner.hasNext()) {
+                String answer = this.scanner.next();
+                if (answer.equals("high")) {
+                    if (offenceCard.getNumber() > defenceCard.getNumber()) {
+                        System.out.printf("プレイヤー%dのカードは%sなのでアタリ！\n", this.players[this.n % 2].getNumber(), offenceCard.showCard());
+                        players[this.n % 2].cardCount += 2;
+                    } else {
+                        System.out.printf("プレイヤー%dのカードは%sなのでハズレ！\n", this.players[this.n % 2].getNumber(), offenceCard.showCard());
+                    }
+                } else {
+                    if (offenceCard.getNumber() < defenceCard.getNumber()) {
+                        System.out.printf("プレイヤー%dのカードは%sなのでアタリ！\n", this.players[this.n % 2].getNumber(), offenceCard.showCard());
+                        players[this.n % 2].cardCount += 2;
+                    } else {
+                        System.out.printf("プレイヤー%dのカードは%sなのでハズレ！\n", this.players[this.n % 2].getNumber(), offenceCard.showCard());
+                    }
+                }
+                this.players[this.n % 2].getHands().remove(offenceCard);
+                this.players[(this.n + 1) % 2].getHands().remove(defenceCard);
+                this.n += 1;
+            } else {
+                System.out.println("入力がありません。");
+            }
+        } 
+        finishGame();
+    }
+
+    public int startPlayer() {
+        Random random = new Random();
+        int start = random.nextInt(2);
+        if (start == 0) {
+            return 0;
+        } else {
+            return 1;
         }
+    }
+
+    public void finishGame() {
+        System.out.println("ゲーム終了！");
+        System.out.printf("プレイヤー%dの枚数は%d、プレイヤー%dの枚数は%d！\n", this.players[0].getNumber(), this.players[0].cardCount, this.players[1].getNumber(), this.players[1].cardCount);
+        if (this.players[0].cardCount > this.players[1].cardCount) {
+            System.out.printf("プレイヤー%dの勝ち！\n", this.players[0].getNumber());
+        } else if (this.players[0].cardCount < this.players[1].cardCount) {
+            System.out.printf("プレイヤー%dの勝ち！\n", this.players[1].getNumber());
+        } else {
+            System.out.printf("プレイヤー%dとプレイヤー%dは引き分けで終了！\n", this.players[0].getNumber(), this.players[1].getNumber());
+        }
+        System.exit(0);
     }
 }

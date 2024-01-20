@@ -4,5 +4,6 @@ public class Main {
     public static void main(String[] args) {
         GameMaster test = new GameMaster();
         test.dealOut();
+        test.startGame();
     }
 }
