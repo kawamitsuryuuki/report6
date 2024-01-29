@@ -1,4 +1,4 @@
-package jp.ac.uryukyu.ie.e235718;
+package jp.ac.uryukyu.ie.e235746;
 
 import java.util.ArrayList;
 import java.util.Random;
